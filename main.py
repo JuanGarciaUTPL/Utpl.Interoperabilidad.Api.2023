@@ -7,6 +7,7 @@ personas = [
     {"id": 1, "nombre": "Juan", "edad": 30},
     {"id": 2, "nombre": "María", "edad": 25},
     {"id": 3, "nombre": "Pedro", "edad": 35},
+    {"id": 4, "nombre": "Felpe", "edad": 36},
 ]
 
 # Ruta para listar todas las personas

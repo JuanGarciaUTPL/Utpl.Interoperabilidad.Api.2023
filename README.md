@@ -17,7 +17,7 @@ Este proyecto proporciona los elementos necesarios para crear un API básica con
    - Eliminar una persona
    - Editar una persona
    - Obtener una persona por ID
-   - Obtener todas las personas
+   - Obtener todas las personas sin base de datos
 
    Recuerda que no es necesario conectar el API a una base de datos; puedes almacenar temporalmente los datos en memoria.
 
