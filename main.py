@@ -4,17 +4,27 @@ from typing import List
 
 app = FastAPI()
 
-# Datos de ejemplo para personas
-personas = [
-    {"id": 1, "nombre": "Juan", "edad": 30},
-    {"id": 2, "nombre": "María", "edad": 25},
-    {"id": 3, "nombre": "Pedro", "edad": 35},
-]
+# Modelo de datos para una persona
+class Person(BaseModel):
+    name: str
+    age: int
+    email: str
+    id: int
+    identification: str
 
-# Ruta para listar todas las personas
-@app.get("/personas")
-async def listar_personas():
-    return personas
+# Lista para almacenar personas (simulación de base de datos)
+people_db = []
+
+# Operación para crear una persona
+@app.post("/persona/", response_model=Person)
+def create_person(person: Person):
+    people_db.append(person)
+    return person
+
+# Operación para obtener todas las personas
+@app.get("/persona/", response_model=List[Person])
+def get_all_people():
+    return people_db
 
 # Operación para obtener una persona por ID
 @app.get("/persona/{person_id}", response_model=Person)
