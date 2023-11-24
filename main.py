@@ -11,6 +11,7 @@ class Person(BaseModel):
     email: str
     id: int
     identification: str
+    city: str
 
 # Lista para almacenar personas (simulación de base de datos)
 people_db = []
