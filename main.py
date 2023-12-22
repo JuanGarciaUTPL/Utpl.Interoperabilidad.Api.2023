@@ -63,18 +63,29 @@ def create_person(personInput: PersonDto):
     return itemPersona
 
 # Operación para obtener todas las personas
-@app.get("/persona/", response_model=List[PersonDto], tags=["Persona"])
+@app.get("/persona/", response_model=List[PersonRepository], tags=["Persona"])
 def get_all_people():
-    return people_db
+    items = list(coleccion.find())
+    return items
 
 # Operación para obtener una persona por ID
 @app.get("/persona/{person_id}", response_model=PersonDto, tags=["Persona"])
-def get_person_by_id(person_id: int):
-    for person in people_db:
-        if person.id == person_id:
-            return person
-    raise HTTPException(status_code=404, detail="Persona no encontrada")
+def get_person_by_id(person_id: str):
+    item = coleccion.find_one({"id": person_id})
+    if item is not None:
+        return item
+    else:
+        raise HTTPException(status_code=404, detail="Persona no encontrada")
 
+# Operación para obtener una persona por identificacion
+@app.get("/persona/idenficacion/{person_identificacion}", response_model=PersonDto, tags=["Persona"])
+def get_person_by_identification(person_identificacion: str):
+    item = coleccion.find_one({"identification": person_identificacion})
+    if item is not None:
+        return item
+    else:
+        raise HTTPException(status_code=404, detail="Persona no encontrada")
+    
 # Operación para editar una persona por ID
 @app.put("/persona/{person_id}", response_model=PersonDto, tags=["Persona"])
 def update_person(person_id: int, updated_person: PersonDto):
@@ -85,10 +96,10 @@ def update_person(person_id: int, updated_person: PersonDto):
     raise HTTPException(status_code=404, detail="Persona no encontrada")
 
 # Operación para eliminar una persona por ID
-@app.delete("/persona/{person_id}", response_model=PersonDto, tags=["Persona"])
-def delete_person(person_id: int):
-    for index, person in enumerate(people_db):
-        if person.id == person_id:
-            deleted_person = people_db.pop(index)
-            return deleted_person
-    raise HTTPException(status_code=404, detail="Persona no encontrada")
+@app.delete("/persona/{person_id}", tags=["Persona"])
+def delete_person(person_id: str):
+    result = coleccion.delete_one({"id": person_id})
+    if result.deleted_count == 1:
+        return {"mensaje": "Persona eliminada correctamente"}
+    else:
+        raise HTTPException(status_code=404, detail="Persona no encontrada")
