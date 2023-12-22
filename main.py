@@ -2,6 +2,17 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 
+#libreria para generar un id unico
+import uuid
+
+#importar librerias para el manejo de la base de datos pymongo
+import pymongo
+
+#configuracion de mongo
+cliente = pymongo.MongoClient("mongodb+srv://utplinteroperabilidad:0b1Fd3PFZZInSuZK@cluster0.susnphb.mongodb.net/?retryWrites=true&w=majority")
+database = cliente["directorio"]
+coleccion = database["persona"]
+
 app = FastAPI(
     title="API de personas del segundo parcial",
     description="API para el manejo de personas en el segundo parcial de la materia de Interoperabilidad",
@@ -24,30 +35,40 @@ app = FastAPI(
 )
 
 # Modelo de datos para una persona
-class Person(BaseModel):
+class PersonDto(BaseModel):
     name: str
     age: int
     email: str
-    id: int
     identification: str
     city: str
+
+# Modelo de datos para una persona con ID, para conectar con la base de datos
+class PersonRepository(BaseModel):
+    name: str
+    age: int
+    email: str
+    identification: str
+    city: str
+    id: str
 
 # Lista para almacenar personas (simulación de base de datos)
 people_db = []
 
 # Operación para crear una persona
-@app.post("/persona/", response_model=Person, tags=["Persona"])
-def create_person(person: Person):
-    people_db.append(person)
-    return person
+@app.post("/persona/", response_model=PersonRepository, tags=["Persona"])
+def create_person(personInput: PersonDto):
+    idPerson = str(uuid.uuid4())
+    itemPersona = PersonRepository(name=personInput.name, age=personInput.age, email=personInput.email, identification=personInput.identification, city=personInput.city, id=idPerson)
+    result = coleccion.insert_one(itemPersona.dict())
+    return itemPersona
 
 # Operación para obtener todas las personas
-@app.get("/persona/", response_model=List[Person], tags=["Persona"])
+@app.get("/persona/", response_model=List[PersonDto], tags=["Persona"])
 def get_all_people():
     return people_db
 
 # Operación para obtener una persona por ID
-@app.get("/persona/{person_id}", response_model=Person, tags=["Persona"])
+@app.get("/persona/{person_id}", response_model=PersonDto, tags=["Persona"])
 def get_person_by_id(person_id: int):
     for person in people_db:
         if person.id == person_id:
@@ -55,8 +76,8 @@ def get_person_by_id(person_id: int):
     raise HTTPException(status_code=404, detail="Persona no encontrada")
 
 # Operación para editar una persona por ID
-@app.put("/persona/{person_id}", response_model=Person, tags=["Persona"])
-def update_person(person_id: int, updated_person: Person):
+@app.put("/persona/{person_id}", response_model=PersonDto, tags=["Persona"])
+def update_person(person_id: int, updated_person: PersonDto):
     for index, person in enumerate(people_db):
         if person.id == person_id:
             people_db[index] = updated_person
@@ -64,7 +85,7 @@ def update_person(person_id: int, updated_person: Person):
     raise HTTPException(status_code=404, detail="Persona no encontrada")
 
 # Operación para eliminar una persona por ID
-@app.delete("/persona/{person_id}", response_model=Person, tags=["Persona"])
+@app.delete("/persona/{person_id}", response_model=PersonDto, tags=["Persona"])
 def delete_person(person_id: int):
     for index, person in enumerate(people_db):
         if person.id == person_id:
