@@ -87,13 +87,15 @@ def get_person_by_identification(person_identificacion: str):
         raise HTTPException(status_code=404, detail="Persona no encontrada")
     
 # Operación para editar una persona por ID
-@app.put("/persona/{person_id}", response_model=PersonDto, tags=["Persona"])
-def update_person(person_id: int, updated_person: PersonDto):
-    for index, person in enumerate(people_db):
-        if person.id == person_id:
-            people_db[index] = updated_person
-            return updated_person
-    raise HTTPException(status_code=404, detail="Persona no encontrada")
+@app.put("/persona/{person_id}", tags=["Persona"])
+def update_person(person_id: str, updated_person: PersonDto):
+    item = coleccion.find_one({"id": person_id})
+    if item is not None:
+        updated_person = { "$set": { "name": updated_person.name, "age": updated_person.age, "email": updated_person.email, "identification": updated_person.identification, "city": updated_person.city } }
+        coleccion.update_one(item, updated_person)
+        return {"mensaje": "Persona actualizada correctamente"}
+    else:
+        raise HTTPException(status_code=404, detail="Persona no encontrada")
 
 # Operación para eliminar una persona por ID
 @app.delete("/persona/{person_id}", tags=["Persona"])
