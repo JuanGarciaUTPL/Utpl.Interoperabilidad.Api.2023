@@ -9,7 +9,7 @@ import uuid
 import pymongo
 
 #libreria para el manejo de versiones
-from versioned_fastapi import version, FastApiVersioner
+#from versioned_fastapi import version, FastApiVersioner
 
 #configuracion de mongo
 cliente = pymongo.MongoClient("mongodb+srv://utplinteroperabilidad:0b1Fd3PFZZInSuZK@cluster0.susnphb.mongodb.net/?retryWrites=true&w=majority")
@@ -71,7 +71,7 @@ class PersonRepository(BaseModel):
 people_db = []
 
 # Operación para crear una persona
-@version(1)
+#@version(1)
 @app.post("/persona/", response_model=PersonRepository, tags=["Persona"])
 def create_person(personInput: PersonDto):
     idPerson = str(uuid.uuid4())
@@ -80,7 +80,7 @@ def create_person(personInput: PersonDto):
     return itemPersona
 
 # Operación para crear una persona v2
-@version(2)
+#@version(2)
 @app.post("/persona/", response_model=PersonRepository, tags=["Persona"])
 def create_person(personInput: PersonDtoV2):
     idPerson = str(uuid.uuid4())
@@ -89,14 +89,14 @@ def create_person(personInput: PersonDtoV2):
     return itemPersona
 
 # Operación para obtener todas las personas
-@version(1)
+#@version(1)
 @app.get("/persona/", response_model=List[PersonRepository], tags=["Persona"])
 def get_all_people():
     items = list(coleccion.find())
     return items
 
 # Operación para obtener una persona por ID
-@version(1)
+#@version(1)
 @app.get("/persona/{person_id}", response_model=PersonDto, tags=["Persona"])
 def get_person_by_id(person_id: str):
     item = coleccion.find_one({"id": person_id})
@@ -106,7 +106,7 @@ def get_person_by_id(person_id: str):
         raise HTTPException(status_code=404, detail="Persona no encontrada")
 
 # Operación para obtener una persona por identificacion
-@version(1)
+#@version(1)
 @app.get("/persona/idenficacion/{person_identificacion}", response_model=PersonDto, tags=["Persona"])
 def get_person_by_identification(person_identificacion: str):
     item = coleccion.find_one({"identification": person_identificacion})
@@ -116,7 +116,7 @@ def get_person_by_identification(person_identificacion: str):
         raise HTTPException(status_code=404, detail="Persona no encontrada")
     
 # Operación para editar una persona por ID
-@version(1)
+#@version(1)
 @app.put("/persona/{person_id}", tags=["Persona"])
 def update_person(person_id: str, updated_person: PersonDto):
     item = coleccion.find_one({"id": person_id})
@@ -128,7 +128,7 @@ def update_person(person_id: str, updated_person: PersonDto):
         raise HTTPException(status_code=404, detail="Persona no encontrada")
 
 # Operación para eliminar una persona por ID
-@version(1)
+#@version(1)
 @app.delete("/persona/{person_id}", tags=["Persona"])
 def delete_person(person_id: str):
     result = coleccion.delete_one({"id": person_id})
@@ -139,4 +139,4 @@ def delete_person(person_id: str):
 
 # Version your app
 # It will add version prefixes and customize the swagger docs
-versions = FastApiVersioner(app).version_fastapi()
+#versions = FastApiVersioner(app).version_fastapi()
